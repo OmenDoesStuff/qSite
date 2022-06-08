@@ -1,6 +1,6 @@
-package net.frozenorb.placeholder;
+package org.minehq.placeholder;
 
-import net.frozenorb.data.GameType;
+import org.minehq.data.GameType;
 import org.apache.commons.text.StrSubstitutor;
 
 import java.util.HashMap;
@@ -11,10 +11,10 @@ import java.util.Map;
 // TODO: Make it work, make it better, make it like function
 @SuppressWarnings({"deprecation", "unused"})
 public class LeaderboardPlaceholder {
-    public String fillIn(String raw, GameType type) {
+    public static String fillIn(String raw, GameType type) {
         if(type == GameType.PRACTICE) {
             Map<String, String> data = new HashMap<>();
-            data.put("global.1", "");
+            data.put("global.1", "1");
 
             return StrSubstitutor.replace(raw, data);
         }

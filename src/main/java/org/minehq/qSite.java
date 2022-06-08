@@ -1,4 +1,9 @@
-package net.frozenorb.handler.practice;
+package org.minehq;
+
+import net.frozenorb.base.*;
+import org.minehq.base.Server;
+import org.minehq.route.main.MainRoute;
+import org.minehq.util.qLogger;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -9,51 +14,32 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-public class LeaderboardHandler implements Runnable{
+public class qSite implements Runnable{
 
-    static final File WEB_ROOT = new File("/practice/");
-    static final String DEFAULT_FILE = "leaderboard.html";
+    private static qLogger logger = new qLogger("qSite");
+    static final File WEB_ROOT = new File(".");
+    static final String DEFAULT_FILE = "index.html";
     static final String FILE_NOT_FOUND = "404.html";
     static final String METHOD_NOT_SUPPORTED = "not_supported.html";
-    // port to listen connection
     static final int PORT = 8080;
 
-    // verbose mode
     static final boolean verbose = true;
 
-    // Client Connection via Socket Class
-    private Socket connect;
-
-    public LeaderboardHandler(Socket c) {
-        connect = c;
-    }
+    private static Socket connect;
 
     public static void main(String[] args) {
-        try {
-            ServerSocket serverConnect = new ServerSocket(PORT);
-            System.out.println("Server started.\nListening for connections on port : " + PORT + " ...\n");
+        Server server = Server.create();
 
-            // we listen until user halts server execution
-            while (true) {
-                LeaderboardHandler myServer = new LeaderboardHandler(serverConnect.accept());
+        server.get("/", new MainRoute());
 
-                if (verbose) {
-                    System.out.println("Connecton opened. (" + new Date() + ")");
-                }
+        server.start(80);
+        server.start(443);
 
-                // create dedicated thread to manage the client connection
-                Thread thread = new Thread(myServer);
-                thread.start();
-            }
 
-        } catch (IOException e) {
-            System.err.println("Server Connection error : " + e.getMessage());
-        }
     }
 
     @Override
@@ -81,7 +67,7 @@ public class LeaderboardHandler implements Runnable{
             // we support only GET and HEAD methods, we check
             if (!method.equals("GET")  &&  !method.equals("HEAD")) {
                 if (verbose) {
-                    System.out.println("501 Not Implemented : " + method + " method.");
+                    getLogger().warn("501 Not Implemented : " + method + " method.");
                 }
 
                 // we return the not supported file to the client
@@ -93,7 +79,7 @@ public class LeaderboardHandler implements Runnable{
 
                 // we send HTTP Headers with data to client
                 out.println("HTTP/1.1 501 Not Implemented");
-                out.println("Server: qSite");
+                out.println("Server: JqSite");
                 out.println("Date: " + new Date());
                 out.println("Content-type: " + contentMimeType);
                 out.println("Content-length: " + fileLength);
@@ -118,7 +104,7 @@ public class LeaderboardHandler implements Runnable{
 
                     // send HTTP Headers
                     out.println("HTTP/1.1 200 OK");
-                    out.println("Server: qSite");
+                    out.println("Server: JqSite");
                     out.println("Date: " + new Date());
                     out.println("Content-type: " + content);
                     out.println("Content-length: " + fileLength);
@@ -130,7 +116,7 @@ public class LeaderboardHandler implements Runnable{
                 }
 
                 if (verbose) {
-                    System.out.println("File " + fileRequested + " of type " + content + " returned");
+                    getLogger().verbose("File " + fileRequested + " of type " + content + " returned");
                 }
 
             }
@@ -139,11 +125,11 @@ public class LeaderboardHandler implements Runnable{
             try {
                 fileNotFound(out, dataOut, fileRequested);
             } catch (IOException ioe) {
-                System.err.println("Error with file not found exception : " + ioe.getMessage());
+                getLogger().error("Error with file not found exception : " + ioe.getMessage());
             }
 
         } catch (IOException ioe) {
-            System.err.println("Server error : " + ioe);
+            getLogger().error("Server error : " + ioe);
         } finally {
             try {
                 in.close();
@@ -151,11 +137,11 @@ public class LeaderboardHandler implements Runnable{
                 dataOut.close();
                 connect.close(); // we close socket connection
             } catch (Exception e) {
-                System.err.println("Error closing stream : " + e.getMessage());
+                getLogger().error("Error closing stream : " + e.getMessage());
             }
 
             if (verbose) {
-                System.out.println("Connection closed.\n");
+                getLogger().verbose("Connection closed.\n");
             }
         }
 
@@ -192,7 +178,7 @@ public class LeaderboardHandler implements Runnable{
         byte[] fileData = readFileData(file, fileLength);
 
         out.println("HTTP/1.1 404 File Not Found");
-        out.println("Server: qSite");
+        out.println("Server: JqSite");
         out.println("Date: " + new Date());
         out.println("Content-type: " + content);
         out.println("Content-length: " + fileLength);
@@ -203,8 +189,11 @@ public class LeaderboardHandler implements Runnable{
         dataOut.flush();
 
         if (verbose) {
-            System.out.println("File " + fileRequested + " not found");
+            getLogger().error("File " + fileRequested + " not found");
         }
     }
 
+    public static qLogger getLogger() {
+        return logger;
+    }
 }

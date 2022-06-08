@@ -1,4 +1,4 @@
-package net.frozenorb.data;
+package org.minehq.data;
 
 public enum GameType {
     HCTEAMS("HCTeams"),
