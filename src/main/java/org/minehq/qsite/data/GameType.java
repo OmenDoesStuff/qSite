@@ -1,4 +1,4 @@
-package org.minehq.data;
+package org.minehq.qsite.data;
 
 public enum GameType {
     HCTEAMS("HCTeams"),
