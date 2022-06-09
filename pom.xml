@@ -16,6 +16,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <developers>
+        <developer>
+            <name>Polarian</name>
+            <email>polarian@polarian.dev</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>GNU Public License v3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+        </license>
+    <licenses>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>
